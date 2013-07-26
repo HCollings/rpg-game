@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+
+try:
+    import os
+    import sys
+    import pygame    
+except ImportError, err:
+    print "cannot load module(s)"
+    sys.exit(2)  
+
+# resource handling
+
+def load_image(name):
+    fullname = os.path.join("src", name)
+    try:
+        image = pygame.image.load(fullname)
+        if image.get_alpha() is None:
+            image = image.convert()
+        else:
+            image = image.convert_alpha()        
+    except pygame.error, message:
+        print "cannot load image:", name
+        raise SystemExit, message
+    return image, image.get_rect()         
+
+def load_sound(name):
+    fullname = os.path.join("src", name)
+    try:
+        sound = pygame.mixer.Sound(fullname)
+    except pygame.error, message:
+        print "Cannot load sound:", wav
+        raise SystemExit, message
+    return sound
