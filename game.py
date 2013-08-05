@@ -65,7 +65,15 @@ class Game:
         if (level_offset_bottom > 0 and player_screen_offset_bottom < 200):
             self.background_rect.top -= 16
         if (level_offset_left > 0 and player_screen_offset_left < 200):
-            self.background_rect.left += 16        
+            self.background_rect.left += 16
+        if player.rect.top <= 0:
+            player.rect.top = 0
+        if (player.rect.left + player.rect.width) >= level.actual_width:
+            player.rect.left = level.actual_width - player.rect.width
+        if (player.rect.top + player.rect.height) >= level.actual_height:
+            player.rect.top = level.actual_height - player.rect.height
+        if player.rect.left <= 0:
+            player.rect.left = 0
 
     def update(self):
         #call update method for all entities
@@ -89,32 +97,23 @@ class Game:
                 self.update()
                 self.handle_scrolling(level, player)
                 self.accumulator -= dt           
-            # events
+                # events
+                keys_down = pygame.key.get_pressed()
+                if keys_down[K_w]:       
+                    player.move("up", dt)
+                if keys_down[K_d]:
+                    player.move("right", dt)
+                if keys_down[K_s]:
+                    player.move("down", dt)
+                if keys_down[K_a]:
+                    player.move("left", dt)
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == KEYDOWN:
-                    if event.key == K_w:
-                        player.state = "moving_up"
-                    if event.key == K_d:
-                        player.state = "moving_right"                    
-                    if event.key == K_s:
-                        player.state = "moving_down"
-                    if event.key == K_a:
-                        player.state = "moving_left"
-                elif event.type == KEYUP:
-                    if event.key == K_w:
-                        player.state = "stopping_up"
-                    if event.key == K_d:
-                        player.state = "stopping_right"                    
-                    if event.key == K_s:
-                        player.state = "stopping_down"
-                    if event.key == K_a:
-                        player.state = "stopping_left"       
             # render
             self.render()
-            pygame.display.update()        
+            pygame.display.update()       
     
 def main():
     pygame.init()
