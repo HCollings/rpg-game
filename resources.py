@@ -8,9 +8,8 @@ except ImportError, err:
     print "cannot load module(s)"
     sys.exit(2)  
 
-# resource handling
-
 def load_image(name):
+    #load an image and get its rect
     fullname = os.path.join("src", name)
     try:
         image = pygame.image.load(fullname)
@@ -24,6 +23,7 @@ def load_image(name):
     return image, image.get_rect()         
 
 def load_sound(name):
+    #load a sound
     fullname = os.path.join("src", name)
     try:
         sound = pygame.mixer.Sound(fullname)

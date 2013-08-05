@@ -9,42 +9,50 @@ except ImportError, err:
     print "cannot load module(s)"
     sys.exit(2)  
 
-# objects
+class Level:
 
-class Level(object):
+    def __init__(self, level_name = "", level_key = ""):
+        #map is stored in a 2d array
+        self.map = []
+        #the key finds the corresponding tile according to map character
+        self.key = {}
+        #os independant file paths
+        self.level_path = os.path.join("src", level_name)
+        self.key_path = os.path.join("src", level_key)
 
     def load_tiles(self, name):
+        #load the tileset
         level, level_rect = load_image(name)
         image_width = level.get_width()
         self.tile_size = 32
         self.tiles = []
+        #cut each tile from the tileset and append to an array for later use
         for i in range (0, image_width / self.tile_size):
             rect = (i * self.tile_size, 0, self.tile_size, self.tile_size)
             self.tiles.append(level.subsurface(rect))
     
-    def load_map(self, level_name, level_key):
-
-        self.map = []        
-        level_path = os.path.join("levels", level_name)
-        level_file = open(level_path, "r")
+    def load_map(self):
+        #reads the map from file
+        level_file = open(self.level_path, "r")
         self.map = level_file.read().split("\n")
         level_file.close()
-        
-        self.key = {}
-        key_path = os.path.join("levels", level_key)
+
+        #reads the key from file
         parser = ConfigParser.ConfigParser()
-        parser.read(key_path)
+        parser.read(self.key_path)
         for section in parser.sections():
-            tile_desc = dict(parser.items(section))
-            self.key[section] = tile_desc
+            tile_description = dict(parser.items(section))
+            self.key[section] = tile_description
+
+        #set some variables for later use
         self.width = len(self.map[0])
         self.height = len(self.map)
-
         self.actual_width = self.width * self.tile_size
         self.actual_height = self.height * self.tile_size
         
-    def render(self):
-        image = pygame.Surface((self.actual_width, self.actual_height)) 
+    def create(self):
+        #build the level image, also return its rect
+        image = pygame.Surface((self.actual_width, self.actual_height)).convert()
         for y, line in enumerate(self.map):
             for x, tile in enumerate(line):
                 tile = self.key[tile]
@@ -56,29 +64,3 @@ class Level(object):
                 image.blit(tile_image, (x * self.tile_size, y * self.tile_size))
         return image, image.get_rect()
                     
-
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image("player.png")
-
-        self.v = 10.0
-        self.pos = [0, 0]
-        self.rect.top = 400
-        self.rect.left = 400
-        self.moving_up = False
-        self.moving_right = False
-        self.moving_down = False
-        self.moving_left = False
-
-    def update(self, dt):
-        if self.moving_up:
-            self.pos[1] = self.pos[1] - (self.v * dt)
-        if self.moving_right:
-            self.pos[0] = self.pos[0] + (self.v * dt)   
-        if self.moving_down:
-            self.pos[1] = self.pos[1] + (self.v * dt)    
-        if self.moving_left:
-            self.pos[0] = self.pos[0] - (self.v * dt)
-        new_pos = self.rect.move(self.pos)
-        self.rect = new_pos
