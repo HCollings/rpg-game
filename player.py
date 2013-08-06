@@ -24,11 +24,12 @@ class Player(pygame.sprite.Sprite):
         self.right = self.rect.left + self.rect.width
         self.bottom = self.rect.top + self.rect.height
         self.left = self.rect.left
+        self.movement_cooldown = 0.0
+        self.movement_limit = 0.16
         
     def update(self):
         #movement
         x, y = self.get_position()
-        print self.position
         self.rect.top = y
         self.rect.left = x
         #collisions
@@ -43,27 +44,12 @@ class Player(pygame.sprite.Sprite):
         y = int(self.position[1]) / 32
         return x, y
 
-    def move(self, direction, dt, progress):
-        if progress == 0:
-            if direction == "up":
-                self.position[1] -= self.speed * dt
-            if direction == "right":
-                self.position[0] += self.speed * dt
-            if direction == "down":
-                self.position[1] += self.speed * dt
-            if direction == "left":
-                self.position[0] -= self.speed * dt
-        elif progress == 1:
-            if direction == "up":
-                s = int(self.location[1]) % 32
-                self.position[1] -= s
-            if direction == "right":
-                s = 32 - (int(self.location[0]) % 32)
-                t = s / self.speed
-                self.move(direction, t, 0)
-            if direction == "down":
-                s = 32 - (int(self.location[1]) % 32)
-                self.position[1] += s
-            if direction == "left":
-                s = int(self.location[0]) % 32
-                self.position[0] -= s
+    def move(self, direction, dt):
+        if direction == "up":
+            self.position[1] -= self.speed * self.movement_limit
+        if direction == "right":
+            self.position[0] += self.speed * self.movement_limit
+        if direction == "down":
+            self.position[1] += self.speed * self.movement_limit
+        if direction == "left":
+            self.position[0] -= self.speed * self.movement_limit

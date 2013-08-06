@@ -91,28 +91,23 @@ class Game:
 
     def handle_events(self, player):
         dt = self.__dt
+        player.movement_cooldown += dt
         self.keys_down = pygame.key.get_pressed()
-        if self.keys_down[K_w]:       
-            player.move("up", dt, 0)
-        if self.keys_down[K_d]:
-            player.move("right", dt, 0)
-        if self.keys_down[K_s]:
-            player.move("down", dt, 0)
-        if self.keys_down[K_a]:
-            player.move("left", dt, 0)
+        print player.movement_cooldown, player.movement_limit
+        if player.movement_cooldown >= player.movement_limit:
+            if self.keys_down[K_w]:       
+                player.move("up", dt)
+            if self.keys_down[K_d]:
+                player.move("right", dt)
+            if self.keys_down[K_s]:
+                player.move("down", dt)
+            if self.keys_down[K_a]:
+                player.move("left", dt)
+            player.movement_cooldown = 0.0
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()                
-            if event.type == KEYUP:
-                if event.key == K_w:
-                    player.move("up", dt, 1)
-                if event.key == K_d:
-                    player.move("right", dt, 1)
-                if event.key == K_s:
-                    player.move("down", dt, 1)
-                if event.key == K_a:
-                    player.move("left", dt, 1)
 
     def update(self):
         #call update method for all entities
