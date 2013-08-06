@@ -49,7 +49,7 @@ class Game:
         #returns time passed in seconds
         return float(pygame.time.get_ticks()) / 1000.0
 
-    def handle_scrolling(self, player):
+    def handle_collisions(self, player):
         screen_rect = self.screen.get_rect()
         level_offset_top = - self.background_rect.top
         level_offset_right = self.background_rect.width - (-self.background_rect.left + screen_rect.width)
@@ -68,6 +68,27 @@ class Game:
         if (level_offset_left > 0 and player_screen_offset_left < 200):
             self.background_rect.left += 8
 
+        player.location[0] = player.position[0] - self.background_rect.left
+        player.location[1] = player.position[1] - self.background_rect.top
+        if player.location[1] < 0:
+            player.position[1] = 0
+        if player.location[0] + player.rect.width > self.background_rect.width:
+            player.position[0] = screen_rect.width - player.rect.width
+        if player.location[1] + player.rect.height > self.background_rect.height:
+            player.position[1] = screen_rect.height - player.rect.height
+        if player.location[0] < 0:
+            player.position[0] = 0        
+
+    def scroll_screen(self, direction):
+        if direction == "up":
+            self.background_rect.top += 32
+        if direction == "right":
+            self.background_rect.left -= 32
+        if direction == "down":
+            self.background_rect.top -= 32
+        if direction == "left":
+            self.background_rect.left += 32        
+
     def handle_events(self, player):
         dt = self.__dt
         self.keys_down = pygame.key.get_pressed()
@@ -78,7 +99,7 @@ class Game:
         if self.keys_down[K_s]:
             player.move("down", dt, 0)
         if self.keys_down[K_a]:
-            player.move("left", dt, 0)        
+            player.move("left", dt, 0)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -113,7 +134,7 @@ class Game:
             # update
             while self.accumulator >= dt:
                 self.update()
-                self.handle_scrolling(player)
+                self.handle_collisions(player)
                 self.accumulator -= dt           
                 self.handle_events(player)
             # render
