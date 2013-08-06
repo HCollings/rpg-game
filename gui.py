@@ -9,8 +9,6 @@ except ImportError, err:
     print "cannot load module(s)"
     sys.exit(2)  
 
-# gui
-
 class Menu_item(pygame.font.Font):
     def __init__(self, text, position, font_size = 15, antialias = 1, color = (255,255,255)):
         pygame.font.Font.__init__(self, None, font_size)
@@ -55,3 +53,12 @@ class Menu:
         self.active = True
     def deactivate(self):
         self.active = False
+
+    def handle_event(self, event):
+        if event.type == MOUSEBUTTONDOWN and is_active():
+            x = event.pos[0]
+            y = event.pos[1]
+            for item in self.menu_list:
+                position = item.get_position()
+                if x > position.left and x < position.right and y > position.top and y < position.bottom:
+                    

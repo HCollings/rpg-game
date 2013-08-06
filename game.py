@@ -28,6 +28,7 @@ class Game:
         self.screen_size = (1280, 720)
         self.screen = pygame.display.set_mode(self.screen_size)
         self.name = "RPG"
+        self.keys_down = []        
 
     def load(self):
         #set program stuff
@@ -48,32 +49,49 @@ class Game:
         #returns time passed in seconds
         return float(pygame.time.get_ticks()) / 1000.0
 
-    def handle_scrolling(self, level, player):
+    def handle_scrolling(self, player):
         screen_rect = self.screen.get_rect()
         level_offset_top = - self.background_rect.top
-        level_offset_right = level.actual_width - (-self.background_rect.left + screen_rect.width)
-        level_offset_bottom = level.actual_height - (-self.background_rect.top + screen_rect.height)
+        level_offset_right = self.background_rect.width - (-self.background_rect.left + screen_rect.width)
+        level_offset_bottom = self.background_rect.height - (-self.background_rect.top + screen_rect.height)
         level_offset_left = - self.background_rect.left
         player_screen_offset_top = player.rect.top
         player_screen_offset_right = screen_rect.width - (player.rect.left + player.rect.width)
         player_screen_offset_bottom = screen_rect.height - (player.rect.top + player.rect.height)
         player_screen_offset_left = player.rect.left
         if (level_offset_top > 0 and player_screen_offset_top < 200):
-            self.background_rect.top += 16
+            self.background_rect.top += 8
         if (level_offset_right > 0 and player_screen_offset_right < 200):
-            self.background_rect.left -= 16
+            self.background_rect.left -= 8
         if (level_offset_bottom > 0 and player_screen_offset_bottom < 200):
-            self.background_rect.top -= 16
+            self.background_rect.top -= 8
         if (level_offset_left > 0 and player_screen_offset_left < 200):
-            self.background_rect.left += 16
-        if player.rect.top <= 0:
-            player.rect.top = 0
-        if (player.rect.left + player.rect.width) >= level.actual_width:
-            player.rect.left = level.actual_width - player.rect.width
-        if (player.rect.top + player.rect.height) >= level.actual_height:
-            player.rect.top = level.actual_height - player.rect.height
-        if player.rect.left <= 0:
-            player.rect.left = 0
+            self.background_rect.left += 8
+
+    def handle_events(self, player):
+        dt = self.__dt
+        self.keys_down = pygame.key.get_pressed()
+        if self.keys_down[K_w]:       
+            player.move("up", dt, 0)
+        if self.keys_down[K_d]:
+            player.move("right", dt, 0)
+        if self.keys_down[K_s]:
+            player.move("down", dt, 0)
+        if self.keys_down[K_a]:
+            player.move("left", dt, 0)        
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()                
+            if event.type == KEYUP:
+                if event.key == K_w:
+                    player.move("up", dt, 1)
+                if event.key == K_d:
+                    player.move("right", dt, 1)
+                if event.key == K_s:
+                    player.move("down", dt, 1)
+                if event.key == K_a:
+                    player.move("left", dt, 1)
 
     def update(self):
         #call update method for all entities
@@ -95,22 +113,9 @@ class Game:
             # update
             while self.accumulator >= dt:
                 self.update()
-                self.handle_scrolling(level, player)
+                self.handle_scrolling(player)
                 self.accumulator -= dt           
-                # events
-                keys_down = pygame.key.get_pressed()
-                if keys_down[K_w]:       
-                    player.move("up", dt)
-                if keys_down[K_d]:
-                    player.move("right", dt)
-                if keys_down[K_s]:
-                    player.move("down", dt)
-                if keys_down[K_a]:
-                    player.move("left", dt)
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
+                self.handle_events(player)
             # render
             self.render()
             pygame.display.update()       
