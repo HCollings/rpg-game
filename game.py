@@ -27,11 +27,9 @@ class Game:
         #set program stuff
         self.screen_size = (1280, 720)
         self.screen = pygame.display.set_mode(self.screen_size)
-        self.name = "RPG"
-        self.keys_down = []        
+        self.name = "RPG"     
 
     def load(self):
-        #set program stuff
         self.screen.fill((0, 0, 0))
         pygame.display.set_caption(self.name)
 
@@ -49,8 +47,24 @@ class Game:
         #returns time passed in seconds
         return float(pygame.time.get_ticks()) / 1000.0
 
-    def handle_collisions(self, player):
+    def handle_collisions(self, entity):
         screen_rect = self.screen.get_rect()
+        #update player location relative to map
+        entity.location[0] = entity.position[0] - self.background_rect.left
+        entity.location[1] = entity.position[1] - self.background_rect.top        
+        #stop entity leaving map 
+        if entity.location[1] < 0:
+            entity.position[1] = 0
+        if entity.location[0] + entity.rect.width > self.background_rect.width:
+            entity.position[0] = screen_rect.width - entity.rect.width
+        if entity.location[1] + entity.rect.height > self.background_rect.height:
+            entity.position[1] = screen_rect.height - entity.rect.height
+        if entity.location[0] < 0:
+            entity.position[0] = 0
+
+    def handle_scrolling(self, player):
+        screen_rect = self.screen.get_rect()    
+        #find current offsets
         level_offset_top = - self.background_rect.top
         level_offset_right = self.background_rect.width - (-self.background_rect.left + screen_rect.width)
         level_offset_bottom = self.background_rect.height - (-self.background_rect.top + screen_rect.height)
@@ -59,41 +73,24 @@ class Game:
         player_screen_offset_right = screen_rect.width - (player.rect.left + player.rect.width)
         player_screen_offset_bottom = screen_rect.height - (player.rect.top + player.rect.height)
         player_screen_offset_left = player.rect.left
-        if (level_offset_top > 0 and player_screen_offset_top < 200):
-            self.background_rect.top += 8
+        #if player nears edge of screen, move screen
+        if (level_offset_top > 0 and player_screen_offset_top < 200):      
+            self.background_rect.top += 16
+            player.position[1] += 16
         if (level_offset_right > 0 and player_screen_offset_right < 200):
-            self.background_rect.left -= 8
+            self.background_rect.left -= 16
+            player.position[0] -= 16
         if (level_offset_bottom > 0 and player_screen_offset_bottom < 200):
-            self.background_rect.top -= 8
+            self.background_rect.top -= 16
+            player.position[1] -= 16
         if (level_offset_left > 0 and player_screen_offset_left < 200):
-            self.background_rect.left += 8
-
-        player.location[0] = player.position[0] - self.background_rect.left
-        player.location[1] = player.position[1] - self.background_rect.top
-        if player.location[1] < 0:
-            player.position[1] = 0
-        if player.location[0] + player.rect.width > self.background_rect.width:
-            player.position[0] = screen_rect.width - player.rect.width
-        if player.location[1] + player.rect.height > self.background_rect.height:
-            player.position[1] = screen_rect.height - player.rect.height
-        if player.location[0] < 0:
-            player.position[0] = 0        
-
-    def scroll_screen(self, direction):
-        if direction == "up":
-            self.background_rect.top += 32
-        if direction == "right":
-            self.background_rect.left -= 32
-        if direction == "down":
-            self.background_rect.top -= 32
-        if direction == "left":
-            self.background_rect.left += 32        
+            self.background_rect.left += 16
+            player.position[0] += 16
 
     def handle_events(self, player):
         dt = self.__dt
         player.movement_cooldown += dt
         self.keys_down = pygame.key.get_pressed()
-        print player.movement_cooldown, player.movement_limit
         if player.movement_cooldown >= player.movement_limit:
             if self.keys_down[K_w]:       
                 player.move("up", dt)
@@ -112,6 +109,8 @@ class Game:
     def update(self):
         #call update method for all entities
         self.entities.update()
+        for entity in self.entities:
+            self.handle_collisions(entity)
 
     def render(self):
         self.screen.blit(self.background, self.background_rect)
@@ -129,9 +128,9 @@ class Game:
             # update
             while self.accumulator >= dt:
                 self.update()
-                self.handle_collisions(player)
                 self.accumulator -= dt           
                 self.handle_events(player)
+                self.handle_scrolling(player)
             # render
             self.render()
             pygame.display.update()       

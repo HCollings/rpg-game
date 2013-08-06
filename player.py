@@ -32,7 +32,6 @@ class Player(pygame.sprite.Sprite):
         x, y = self.get_position()
         self.rect.top = y
         self.rect.left = x
-        #collisions
 
     def get_position(self):
         x = int(self.position[0])
