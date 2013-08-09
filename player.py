@@ -21,6 +21,7 @@ class Player(pygame.sprite.Sprite):
         self.location = [0, 0]
         self.movement_cooldown = 0.0
         self.movement_limit = 0.16
+        self.directions_blocked = {}
         self.health = 100.0
         self.mana = 0.0
         self.state = "idle"
@@ -44,26 +45,26 @@ class Player(pygame.sprite.Sprite):
         return x, y
 
     def move(self, direction):
-        if direction == "up":
-            self.state = "moving_up"
-            self.position[1] -= self.speed * self.movement_limit
-            self.state = "idle"
-        if direction == "right":
-            self.state = "moving_right"
-            self.position[0] += self.speed * self.movement_limit
-            self.state = "idle"
-        if direction == "down":
-            self.state = "moving_down"
-            self.position[1] += self.speed * self.movement_limit
-            self.state = "idle"
-        if direction == "left":
-            self.state = "moving_left"
-            self.position[0] -= self.speed * self.movement_limit
-            self.state = "idle"
-
-    def is_blocked(self):
-        directions_blocked = []
-        return directions_blocked
+        if not self.directions_blocked["up"]:
+            if direction == "up":
+                self.state = "moving_up"
+                self.position[1] -= self.speed * self.movement_limit
+                self.state = "idle"
+        if not self.directions_blocked["right"]:
+            if direction == "right":
+                self.state = "moving_right"
+                self.position[0] += self.speed * self.movement_limit
+                self.state = "idle"
+        if not self.directions_blocked["down"]:
+            if direction == "down":
+                self.state = "moving_down"
+                self.position[1] += self.speed * self.movement_limit
+                self.state = "idle"
+        if not self.directions_blocked["left"]:
+            if direction == "left":
+                self.state = "moving_left"
+                self.position[0] -= self.speed * self.movement_limit
+                self.state = "idle"
 
     def modify_health(self, modifier):
         self.health += modifier

@@ -89,7 +89,7 @@ class Game:
             self.background_rect.left += 16
             player.position[0] += 16
 
-    def handle_events(self, player, level):
+    def handle_events(self, player):
         dt = self.__dt
         player.movement_cooldown += dt
         self.keys_down = pygame.key.get_pressed()
@@ -107,15 +107,23 @@ class Game:
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == KEYDOWN:
-                if event.key == K_f:
-                    level.is_wall(0, 0)
+                    
+    def is_player_blocked(self, level, player):
+        x, y = player.get_coordinates()
+        #up, right, down, left
+        player.directions_blocked["up"] = level.is_wall(x, y - 1)
+        player.directions_blocked["right"] = level.is_wall(x + 1, y)
+        player.directions_blocked["down"] = level.is_wall(x, y + 1)
+        player.directions_blocked["left"] = level.is_wall(x - 1, y)
 
-    def update(self):
+    def update(self, level, player):
         #call update method for all entities
         self.entities.update()
         for entity in self.entities:
             self.handle_collisions(entity)
+        self.is_player_blocked(level, player)
+        self.handle_events(player)
+        self.handle_scrolling(player)        
 
     def render(self):
         self.screen.blit(self.background, self.background_rect)
@@ -133,10 +141,8 @@ class Game:
             self.time_current = time_new        
             # update
             while self.accumulator >= dt:
-                self.update()
+                self.update(level, player)
                 self.accumulator -= dt           
-                self.handle_events(player, level)
-                self.handle_scrolling(player)
             # render
             self.render()      
     
