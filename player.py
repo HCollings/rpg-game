@@ -45,26 +45,22 @@ class Player(pygame.sprite.Sprite):
         return x, y
 
     def move(self, direction):
-        if not self.directions_blocked["up"]:
-            if direction == "up":
-                self.state = "moving_up"
-                self.position[1] -= self.speed * self.movement_limit
-                self.state = "idle"
-        if not self.directions_blocked["right"]:
-            if direction == "right":
-                self.state = "moving_right"
-                self.position[0] += self.speed * self.movement_limit
-                self.state = "idle"
-        if not self.directions_blocked["down"]:
-            if direction == "down":
-                self.state = "moving_down"
-                self.position[1] += self.speed * self.movement_limit
-                self.state = "idle"
-        if not self.directions_blocked["left"]:
-            if direction == "left":
-                self.state = "moving_left"
-                self.position[0] -= self.speed * self.movement_limit
-                self.state = "idle"
+        if not self.directions_blocked["up"] and direction == "up":
+            self.state = "moving_up"
+            self.position[1] -= self.speed * self.movement_limit
+            self.state = "idle"
+        if not self.directions_blocked["right"] and direction == "right":
+            self.state = "moving_right"
+            self.position[0] += self.speed * self.movement_limit
+            self.state = "idle"
+        if not self.directions_blocked["down"] and direction == "down":
+            self.state = "moving_down"
+            self.position[1] += self.speed * self.movement_limit
+            self.state = "idle"
+        if not self.directions_blocked["left"] and direction == "left":
+            self.state = "moving_left"
+            self.position[0] -= self.speed * self.movement_limit
+            self.state = "idle"
 
     def modify_health(self, modifier):
         self.health += modifier

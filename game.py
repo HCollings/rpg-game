@@ -110,7 +110,6 @@ class Game:
                     
     def is_player_blocked(self, level, player):
         x, y = player.get_coordinates()
-        #up, right, down, left
         player.directions_blocked["up"] = level.is_wall(x, y - 1)
         player.directions_blocked["right"] = level.is_wall(x + 1, y)
         player.directions_blocked["down"] = level.is_wall(x, y + 1)
@@ -128,7 +127,7 @@ class Game:
     def render(self):
         self.screen.blit(self.background, self.background_rect)
         dirty_rects = self.entities.draw(self.screen)
-        pygame.display.update()         
+        pygame.display.update()
 
     def play(self, level, player):
         dt = self.__dt
