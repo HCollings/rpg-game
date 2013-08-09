@@ -24,7 +24,7 @@ class Level:
         #load the tileset
         level, level_rect = load_image(name)
         image_width = level.get_width()
-        self.tile_size = 32
+        self.tile_size = 64
         self.tiles = []
         #cut each tile from the tileset and append to an array for later use
         for i in range (0, image_width / self.tile_size):
@@ -63,4 +63,18 @@ class Level:
                 tile_image = self.tiles[tile_id]
                 image.blit(tile_image, (x * self.tile_size, y * self.tile_size))
         return image, image.get_rect()
+
+    def get_tile(self, x, y):
+        return self.map[y][x]
+
+    def get_tile_description(self, tile):
+        return self.key[tile]["name"]
+
+    def is_wall(self, x, y):
+        tile = self.get_tile(x, y)
+        tile_description = self.get_tile_description(tile)
+        if tile_description == "wall":
+            return True
+        else:
+            return False
                     

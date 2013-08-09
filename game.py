@@ -23,16 +23,15 @@ class Game:
         self.__dt = 1.0 / self.__physics_FPS
         self.time_current = self.get_time()
         self.accumulator = 0.0
-
         #set program stuff
         self.screen_size = (1280, 720)
         self.screen = pygame.display.set_mode(self.screen_size)
-        self.name = "RPG"     
+        self.name = "RPG"
+        self.font = pygame.font.SysFont("monospace", 15)
 
     def load(self):
         self.screen.fill((0, 0, 0))
         pygame.display.set_caption(self.name)
-
         #initialise objects
         level = Level("level.map", "key.txt")
         level.load_tiles("tiles.png")
@@ -40,12 +39,15 @@ class Game:
         self.background, self.background_rect = level.create()
         player = Player()        
         self.entities = pygame.sprite.Group(player)
-
         self.play(level, player)
 
     def get_time(self):
         #returns time passed in seconds
         return float(pygame.time.get_ticks()) / 1000.0
+
+    def draw_to_hud(self, text, x, y):
+        label = self.font.render(text, 1, (255,255,0))
+        self.screen.blit(label, (x, y))
 
     def handle_collisions(self, entity):
         screen_rect = self.screen.get_rect()
@@ -87,24 +89,27 @@ class Game:
             self.background_rect.left += 16
             player.position[0] += 16
 
-    def handle_events(self, player):
+    def handle_events(self, player, level):
         dt = self.__dt
         player.movement_cooldown += dt
         self.keys_down = pygame.key.get_pressed()
         if player.movement_cooldown >= player.movement_limit:
             if self.keys_down[K_w]:       
-                player.move("up", dt)
+                player.move("up")
             if self.keys_down[K_d]:
-                player.move("right", dt)
+                player.move("right")
             if self.keys_down[K_s]:
-                player.move("down", dt)
+                player.move("down")
             if self.keys_down[K_a]:
-                player.move("left", dt)
+                player.move("left")
             player.movement_cooldown = 0.0
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
-                sys.exit()                
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_f:
+                    level.is_wall(0, 0)
 
     def update(self):
         #call update method for all entities
@@ -114,7 +119,8 @@ class Game:
 
     def render(self):
         self.screen.blit(self.background, self.background_rect)
-        self.entities.draw(self.screen)
+        dirty_rects = self.entities.draw(self.screen)
+        pygame.display.update()         
 
     def play(self, level, player):
         dt = self.__dt
@@ -129,11 +135,10 @@ class Game:
             while self.accumulator >= dt:
                 self.update()
                 self.accumulator -= dt           
-                self.handle_events(player)
+                self.handle_events(player, level)
                 self.handle_scrolling(player)
             # render
-            self.render()
-            pygame.display.update()       
+            self.render()      
     
 def main():
     pygame.init()
