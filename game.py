@@ -108,7 +108,6 @@ class Game:
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-<<<<<<< HEAD
                     
     def is_player_blocked(self, level, player):
         x, y = player.get_coordinates()
@@ -116,8 +115,6 @@ class Game:
         player.directions_blocked["right"] = level.is_wall(x + 1, y)
         player.directions_blocked["down"] = level.is_wall(x, y + 1)
         player.directions_blocked["left"] = level.is_wall(x - 1, y)
-=======
->>>>>>> alternate_movement
 
     def update(self, level, player):
         #call update method for all entities

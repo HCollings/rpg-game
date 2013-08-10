@@ -45,27 +45,6 @@ class Player(pygame.sprite.Sprite):
         y = int(self.location[1]) / 64
         return x, y
 
-<<<<<<< HEAD
-    def move(self, direction):
-        if not self.directions_blocked["up"] and direction == "up":
-            self.state = "moving_up"
-            self.position[1] -= self.speed * self.movement_limit
-            self.state = "idle"
-        if not self.directions_blocked["right"] and direction == "right":
-            self.state = "moving_right"
-            self.position[0] += self.speed * self.movement_limit
-            self.state = "idle"
-        if not self.directions_blocked["down"] and direction == "down":
-            self.state = "moving_down"
-            self.position[1] += self.speed * self.movement_limit
-            self.state = "idle"
-        if not self.directions_blocked["left"] and direction == "left":
-            self.state = "moving_left"
-            self.position[0] -= self.speed * self.movement_limit
-            self.state = "idle"
-
-=======
->>>>>>> alternate_movement
     def modify_health(self, modifier):
         self.health += modifier
         if self.health < 0.0:
