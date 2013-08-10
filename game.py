@@ -29,7 +29,8 @@ class Game:
         self.tile_size = 64
         self.name = "RPG"
         self.font = pygame.font.SysFont("monospace", 15)
-
+        self.movement_points = [0, 0, 0, 0] #up, right, down, left
+        
     def load(self):
         self.screen.fill((0, 0, 0))
         pygame.display.set_caption(self.name)
@@ -74,19 +75,19 @@ class Game:
     def move(self, player, direction):
         if not player.directions_blocked["up"] and direction == "up":
             player.state = "moving_up"
-            self.background_rect.top += player.speed * player.movement_cooldown
+            self.movement_points[0] = 64
             player.state = "idle"
         if not player.directions_blocked["right"] and direction == "right":
             player.state = "moving_right"
-            self.background_rect.left -= player.speed * player.movement_cooldown
+            self.movement_points[1] = 64
             player.state = "idle"
         if not player.directions_blocked["down"] and direction == "down":
             player.state = "moving_down"
-            self.background_rect.top -= player.speed * player.movement_cooldown
+            self.movement_points[2] = 64
             player.state = "idle"
         if not player.directions_blocked["left"] and direction == "left":
             player.state = "moving_left"
-            self.background_rect.left += player.speed * player.movement_cooldown
+            self.movement_points[3] = 64
             player.state = "idle"
 
     def handle_events(self, player):
@@ -119,6 +120,18 @@ class Game:
         self.handle_events(player)     
 
     def render(self):
+        if self.movement_points[0] > 0:
+            self.background_rect.top += 1
+            self.movement_points[0] -= 1
+        if self.movement_points[1] > 0:
+            self.background_rect.left -= 1
+            self.movement_points[1] -= 1
+        if self.movement_points[2] > 0:
+            self.background_rect.top -= 1
+            self.movement_points[2] -= 1
+        if self.movement_points[3] > 0:
+            self.background_rect.left += 1
+            self.movement_points[3] -= 1
         self.screen.blit(self.background, self.background_rect)
         dirty_rects = self.entities.draw(self.screen)
         pygame.display.update()
