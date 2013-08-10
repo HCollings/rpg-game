@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         #player position relative to screen
         self.position = [0, 0]
         #player position relative to map
-        self.location = [640, 640]
+        self.location = [0, 0]
         self.movement_cooldown = 0.0
         self.movement_limit = 0.16
         self.directions_blocked = {}

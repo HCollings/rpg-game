@@ -95,10 +95,12 @@ class Game:
         player.position[1] = (screen_height / 2) - (player.rect.height / 2)
         player.position[0] = (screen_width / 2) - (player.rect.width / 2)
 
-    def set_level_offset(level, player):
-        self.background_rect.top += player.position[1] % self.tile_size
-        self.background_rect.left -= player.position[0] % self.tile_size
-                    
+    def set_level_offset(self, level, player):
+        top_offset = player.location[1] - player.position[1]
+        left_offset = player.location[0] - player.position[0]
+        self.background_rect.top = - top_offset
+        self.background_rect.left = - left_offset
+        
     def is_player_blocked(self, level, player):
         x, y = player.get_coordinates()
         player.directions_blocked["up"] = level.is_wall(x, y - 1)
