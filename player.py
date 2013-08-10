@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         #player position relative to screen
         self.position = [0, 0]
         #player position relative to map
-        self.location = [0, 0]
+        self.location = [640, 640]
         self.movement_cooldown = 0.0
         self.movement_limit = 0.16
         self.directions_blocked = {}
@@ -27,7 +27,6 @@ class Player(pygame.sprite.Sprite):
         self.state = "idle"
         
     def update(self):
-        #movement
         x, y = self.get_position()
         self.rect.top = y
         self.rect.left = x
@@ -43,28 +42,6 @@ class Player(pygame.sprite.Sprite):
         x = int(self.location[0]) / 64
         y = int(self.location[1]) / 64
         return x, y
-
-    def move(self, direction):
-        if not self.directions_blocked["up"]:
-            if direction == "up":
-                self.state = "moving_up"
-                self.position[1] -= self.speed * self.movement_limit
-                self.state = "idle"
-        if not self.directions_blocked["right"]:
-            if direction == "right":
-                self.state = "moving_right"
-                self.position[0] += self.speed * self.movement_limit
-                self.state = "idle"
-        if not self.directions_blocked["down"]:
-            if direction == "down":
-                self.state = "moving_down"
-                self.position[1] += self.speed * self.movement_limit
-                self.state = "idle"
-        if not self.directions_blocked["left"]:
-            if direction == "left":
-                self.state = "moving_left"
-                self.position[0] -= self.speed * self.movement_limit
-                self.state = "idle"
 
     def modify_health(self, modifier):
         self.health += modifier

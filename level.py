@@ -11,7 +11,8 @@ except ImportError, err:
 
 class Level:
 
-    def __init__(self, level_name = "", level_key = ""):
+    def __init__(self, level_name = "", level_key = "", tile_size = 64):
+        self.tile_size = tile_size
         #map is stored in a 2d array
         self.map = []
         #the key finds the corresponding tile according to map character
@@ -24,7 +25,6 @@ class Level:
         #load the tileset
         level, level_rect = load_image(name)
         image_width = level.get_width()
-        self.tile_size = 64
         self.tiles = []
         #cut each tile from the tileset and append to an array for later use
         for i in range (0, image_width / self.tile_size):
