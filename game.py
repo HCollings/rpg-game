@@ -40,7 +40,7 @@ class Game:
         self.background, self.background_rect = level.create()
         player = Player()
         self.entities = pygame.sprite.Group(player)
-        self.set_player_position(player)
+        self.set_player_center(player)
         self.set_level_offset(level, player)
         self.play(level, player)
 
@@ -51,6 +51,43 @@ class Game:
     def draw_to_hud(self, text, x, y):
         label = self.font.render(text, 1, (255,255,0))
         self.screen.blit(label, (x, y))
+
+    def set_player_center(self, player):
+        #set player in screen center
+        (screen_width, screen_height) = self.screen_size
+        player.position[1] = (screen_height / 2) - (player.rect.height / 2)
+        player.position[0] = (screen_width / 2) - (player.rect.width / 2)
+
+    def set_level_offset(self, level, player):
+        top_offset = player.location[1] - player.position[1]
+        left_offset = player.location[0] - player.position[0]
+        self.background_rect.top = - top_offset
+        self.background_rect.left = - left_offset
+
+    def is_player_blocked(self, level, player):
+        x, y = player.get_coordinates()
+        player.directions_blocked["up"] = level.is_wall(x, y - 1)
+        player.directions_blocked["right"] = level.is_wall(x + 1, y)
+        player.directions_blocked["down"] = level.is_wall(x, y + 1)
+        player.directions_blocked["left"] = level.is_wall(x - 1, y)
+
+    def move(self, player, direction):
+        if not player.directions_blocked["up"] and direction == "up":
+            player.state = "moving_up"
+            self.background_rect.top += player.speed * player.movement_cooldown
+            player.state = "idle"
+        if not player.directions_blocked["right"] and direction == "right":
+            player.state = "moving_right"
+            self.background_rect.left -= player.speed * player.movement_cooldown
+            player.state = "idle"
+        if not player.directions_blocked["down"] and direction == "down":
+            player.state = "moving_down"
+            self.background_rect.top -= player.speed * player.movement_cooldown
+            player.state = "idle"
+        if not player.directions_blocked["left"] and direction == "left":
+            player.state = "moving_left"
+            self.background_rect.left += player.speed * player.movement_cooldown
+            player.state = "idle"
 
     def handle_events(self, player):
         dt = self.__dt
@@ -71,50 +108,13 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
-    def move(self, player, direction):
-        if not player.directions_blocked["up"] and direction == "up":
-            player.state = "moving_up"
-            self.background_rect.top += 64
-            player.state = "idle"
-        if not player.directions_blocked["right"] and direction == "right":
-            player.state = "moving_right"
-            self.background_rect.left -= 64
-            player.state = "idle"
-        if not player.directions_blocked["down"] and direction == "down":
-            player.state = "moving_down"
-            self.background_rect.top -= 64
-            player.state = "idle"
-        if not player.directions_blocked["left"] and direction == "left":
-            player.state = "moving_left"
-            self.background_rect.left += 64
-            player.state = "idle"      
-
-    def set_player_position(self, player):
-        #set player in screen center
-        (screen_width, screen_height) = self.screen_size
-        player.position[1] = (screen_height / 2) - (player.rect.height / 2)
-        player.position[0] = (screen_width / 2) - (player.rect.width / 2)
-
-    def set_level_offset(self, level, player):
-        top_offset = player.location[1] - player.position[1]
-        left_offset = player.location[0] - player.position[0]
-        self.background_rect.top = - top_offset
-        self.background_rect.left = - left_offset
-        
-    def is_player_blocked(self, level, player):
-        x, y = player.get_coordinates()
-        player.directions_blocked["up"] = level.is_wall(x, y - 1)
-        player.directions_blocked["right"] = level.is_wall(x + 1, y)
-        player.directions_blocked["down"] = level.is_wall(x, y + 1)
-        player.directions_blocked["left"] = level.is_wall(x - 1, y)
-
     def update(self, level, player):
         #call update method for all entities
         self.entities.update()
         for entity in self.entities:
             #update player location relative to map
             entity.location[0] = entity.position[0] - self.background_rect.left
-            entity.location[1] = entity.position[1] - self.background_rect.top 
+            entity.location[1] = entity.position[1] - self.background_rect.top
         self.is_player_blocked(level, player)
         self.handle_events(player)     
 

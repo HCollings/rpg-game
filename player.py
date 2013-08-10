@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         #player position relative to screen
         self.position = [0, 0]
         #player position relative to map
-        self.location = [0, 0]
+        self.location = [128, 128]
         self.movement_cooldown = 0.0
         self.movement_limit = 0.16
         self.directions_blocked = {}
@@ -27,6 +27,8 @@ class Player(pygame.sprite.Sprite):
         self.state = "idle"
         
     def update(self):
+        #set rect according to position
+        #for other entities the position will be their location relative to map
         x, y = self.get_position()
         self.rect.top = y
         self.rect.left = x
