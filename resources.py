@@ -10,7 +10,7 @@ except ImportError, err:
 
 def load_image(name):
     #load an image and get its rect
-    fullname = os.path.join("src", name)
+    fullname = os.path.join("images", name)
     try:
         image = pygame.image.load(fullname)
         if image.get_alpha() is None:
@@ -24,7 +24,7 @@ def load_image(name):
 
 def load_sound(name):
     #load a sound
-    fullname = os.path.join("src", name)
+    fullname = os.path.join("sounds", name)
     try:
         sound = pygame.mixer.Sound(fullname)
     except pygame.error, message:

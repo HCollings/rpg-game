@@ -18,8 +18,8 @@ class Level:
         #the key finds the corresponding tile according to map character
         self.key = {}
         #os independant file paths
-        self.level_path = os.path.join("src", level_name)
-        self.key_path = os.path.join("src", level_key)
+        self.level_path = os.path.join("data", level_name)
+        self.key_path = os.path.join("data", level_key)
 
     def load_tiles(self, name):
         #load the tileset

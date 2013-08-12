@@ -9,6 +9,8 @@ try:
     from pygame.locals import *
     import level as l
     import player as p
+    import item
+    import items
     import resources
 except ImportError, err:
     print "cannot load module(s)"
@@ -23,13 +25,14 @@ class Game:
         self.__dt = 1.0 / self.__physics_FPS
         self.time_current = self.get_time()
         self.accumulator = 0.0
-        #set program stuff
+        #set program variables
         self.screen_size = (1280, 720)
         self.screen = pygame.display.set_mode(self.screen_size)
         self.tile_size = 64
         self.name = "RPG"
         self.font = pygame.font.SysFont("monospace", 15)
-        
+        #game variables
+       
     def load(self):
         self.screen.fill((0, 0, 0))
         pygame.display.set_caption(self.name)
@@ -42,6 +45,7 @@ class Game:
         self.entities = pygame.sprite.Group(player)
         self.set_player_center(player)
         self.set_level_offset(level, player)
+        
         self.play(level, player)
 
     def get_time(self):
@@ -70,20 +74,6 @@ class Game:
         player.directions_blocked["right"] = level.is_wall(x + 1, y)
         player.directions_blocked["down"] = level.is_wall(x, y + 1)
         player.directions_blocked["left"] = level.is_wall(x - 1, y)
-
-    def move(self, player):
-        if player.movement_points[0] > 0:
-            self.background_rect.top += 1
-            player.movement_points[0] -= 1
-        if player.movement_points[1] > 0:
-            self.background_rect.left -= 1
-            player.movement_points[1] -= 1
-        if player.movement_points[2] > 0:
-            self.background_rect.top -= 1
-            player.movement_points[2] -= 1
-        if player.movement_points[3] > 0:
-            self.background_rect.left += 1
-            player.movement_points[3] -= 1   
 
     def handle_events(self, player):
         dt = self.__dt
@@ -139,7 +129,7 @@ class Game:
             while self.accumulator >= dt:
                 self.update(level, player)
                 self.accumulator -= dt           
-            self.move(player)
+            player.move(self.background_rect)
             #render
             self.render()      
     

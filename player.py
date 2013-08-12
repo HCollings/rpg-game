@@ -14,18 +14,18 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = resources.load_image("player.png")
-        self.speed = 400.0
         #player position relative to screen
         self.position = [0, 0]
         #player position relative to map
         self.location = [128, 128]
+        self.state = "idle"
         self.movement_cooldown = 0.0
         self.movement_limit = 0.16
         self.movement_points = [0, 0, 0, 0] #up, right, down, left
         self.directions_blocked = {}
         self.health = 100.0
         self.mana = 0.0
-        self.state = "idle"
+        self.inventory = []
         
     def update(self):
         #set rect according to position
@@ -33,7 +33,6 @@ class Player(pygame.sprite.Sprite):
         x, y = self.get_position()
         self.rect.top = y
         self.rect.left = x
-        print self.state
         if self.state != "idle":
             self.animate()
         if self.health == 0.0:
@@ -59,8 +58,36 @@ class Player(pygame.sprite.Sprite):
         if not self.directions_blocked["left"] and direction == "left":
             self.movement_points[3] = 64
 
+    def move(self, background_rect):
+        if self.movement_points[0] > 0:
+            background_rect.top += 1
+            self.movement_points[0] -= 1
+        if self.movement_points[1] > 0:
+            background_rect.left -= 1
+            self.movement_points[1] -= 1
+        if self.movement_points[2] > 0:
+            background_rect.top -= 1
+            self.movement_points[2] -= 1
+        if self.movement_points[3] > 0:
+            background_rect.left += 1
+            self.movement_points[3] -= 1   
+
     def animate(self):
-        print "Lol"
+        print "animate"
+
+    def take_item(self, item):
+        self.inventory.append(item)
+
+    def use_item(self, item):
+        item_type = item.get_item_type()
+        if item_type == "weapon":
+            pass
+        elif item_type == "consumable":
+            health_modifier = item.get_health_modifier()
+            mana_modifier = item.get_mana_modifier()
+            self.modify_health(health_modifier)
+            self.modify_mana(mana_modifier)
+        self.inventory.remove(item)
 
     def modify_health(self, modifier):
         self.health += modifier
