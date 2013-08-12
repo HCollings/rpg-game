@@ -10,7 +10,7 @@ try:
     import level as l
     import player as p
     import item
-    import items
+    import item_list
     import resources
 except ImportError, err:
     print "cannot load module(s)"

@@ -3,9 +3,6 @@
 try:
     import os
     import sys
-    import items
-    import player
-    import resources
 except ImportError, err:
     print "cannot load module(s)"
     sys.exit(2)
