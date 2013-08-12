@@ -5,11 +5,11 @@ try:
     import sys
     import math
     import random
-    import pygame    
+    import pygame
     from pygame.locals import *
-    from level import *
-    from player import *
-    from resources import *
+    import level as l
+    import player as p
+    import resources
 except ImportError, err:
     print "cannot load module(s)"
     sys.exit(2)
@@ -29,17 +29,16 @@ class Game:
         self.tile_size = 64
         self.name = "RPG"
         self.font = pygame.font.SysFont("monospace", 15)
-        self.movement_points = [0, 0, 0, 0] #up, right, down, left
         
     def load(self):
         self.screen.fill((0, 0, 0))
         pygame.display.set_caption(self.name)
         #initialise objects
-        level = Level("level.map", "key.txt", self.tile_size)
+        level = l.Level("level.map", "key.txt", self.tile_size)
         level.load_tiles("tiles.png")
         level.load_map()
         self.background, self.background_rect = level.create()
-        player = Player()
+        player = p.Player()
         self.entities = pygame.sprite.Group(player)
         self.set_player_center(player)
         self.set_level_offset(level, player)
@@ -72,23 +71,19 @@ class Game:
         player.directions_blocked["down"] = level.is_wall(x, y + 1)
         player.directions_blocked["left"] = level.is_wall(x - 1, y)
 
-    def move(self, player, direction):
-        if not player.directions_blocked["up"] and direction == "up":
-            player.state = "moving_up"
-            self.movement_points[0] = 64
-            player.state = "idle"
-        if not player.directions_blocked["right"] and direction == "right":
-            player.state = "moving_right"
-            self.movement_points[1] = 64
-            player.state = "idle"
-        if not player.directions_blocked["down"] and direction == "down":
-            player.state = "moving_down"
-            self.movement_points[2] = 64
-            player.state = "idle"
-        if not player.directions_blocked["left"] and direction == "left":
-            player.state = "moving_left"
-            self.movement_points[3] = 64
-            player.state = "idle"
+    def move(self, player):
+        if player.movement_points[0] > 0:
+            self.background_rect.top += 1
+            player.movement_points[0] -= 1
+        if player.movement_points[1] > 0:
+            self.background_rect.left -= 1
+            player.movement_points[1] -= 1
+        if player.movement_points[2] > 0:
+            self.background_rect.top -= 1
+            player.movement_points[2] -= 1
+        if player.movement_points[3] > 0:
+            self.background_rect.left += 1
+            player.movement_points[3] -= 1   
 
     def handle_events(self, player):
         dt = self.__dt
@@ -96,13 +91,13 @@ class Game:
         self.keys_down = pygame.key.get_pressed()
         if player.movement_cooldown >= player.movement_limit:
             if self.keys_down[K_w]:       
-                self.move(player, "up")
+                player.set_movement_points("up")
             if self.keys_down[K_d]:
-                self.move(player, "right")
+                player.set_movement_points("right")
             if self.keys_down[K_s]:
-                self.move(player, "down")
+                player.set_movement_points("down")
             if self.keys_down[K_a]:
-                self.move(player, "left")
+                player.set_movement_points("left")
             player.movement_cooldown = 0.0
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -127,18 +122,6 @@ class Game:
         self.handle_events(player)     
 
     def render(self):
-        if self.movement_points[0] > 0:
-            self.background_rect.top += 1
-            self.movement_points[0] -= 1
-        if self.movement_points[1] > 0:
-            self.background_rect.left -= 1
-            self.movement_points[1] -= 1
-        if self.movement_points[2] > 0:
-            self.background_rect.top -= 1
-            self.movement_points[2] -= 1
-        if self.movement_points[3] > 0:
-            self.background_rect.left += 1
-            self.movement_points[3] -= 1
         self.screen.blit(self.background, self.background_rect)
         dirty_rects = self.entities.draw(self.screen)
         pygame.display.update()
@@ -152,11 +135,12 @@ class Game:
                 time_frame = 0.25
             self.accumulator += time_frame
             self.time_current = time_new        
-            # update
+            #update
             while self.accumulator >= dt:
                 self.update(level, player)
                 self.accumulator -= dt           
-            # render
+            self.move(player)
+            #render
             self.render()      
     
 def main():

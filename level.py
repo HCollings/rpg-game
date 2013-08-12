@@ -4,7 +4,7 @@ try:
     import os
     import pygame    
     import ConfigParser
-    from resources import *
+    import resources
 except ImportError, err:
     print "cannot load module(s)"
     sys.exit(2)  
@@ -23,7 +23,7 @@ class Level:
 
     def load_tiles(self, name):
         #load the tileset
-        level, level_rect = load_image(name)
+        level, level_rect = resources.load_image(name)
         image_width = level.get_width()
         self.tiles = []
         #cut each tile from the tileset and append to an array for later use

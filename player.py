@@ -5,7 +5,7 @@ try:
     import sys
     import pygame
     import math
-    from resources import *
+    import resources
 except ImportError, err:
     print "cannot load module(s)"
     sys.exit(2)  
@@ -13,7 +13,7 @@ except ImportError, err:
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image("player.png")
+        self.image, self.rect = resources.load_image("player.png")
         self.speed = 400.0
         #player position relative to screen
         self.position = [0, 0]
@@ -21,6 +21,7 @@ class Player(pygame.sprite.Sprite):
         self.location = [128, 128]
         self.movement_cooldown = 0.0
         self.movement_limit = 0.16
+        self.movement_points = [0, 0, 0, 0] #up, right, down, left
         self.directions_blocked = {}
         self.health = 100.0
         self.mana = 0.0
@@ -32,6 +33,9 @@ class Player(pygame.sprite.Sprite):
         x, y = self.get_position()
         self.rect.top = y
         self.rect.left = x
+        print self.state
+        if self.state != "idle":
+            self.animate()
         if self.health == 0.0:
             self.die()
 
@@ -44,6 +48,19 @@ class Player(pygame.sprite.Sprite):
         x = int(self.location[0]) / 64
         y = int(self.location[1]) / 64
         return x, y
+
+    def set_movement_points(self, direction):
+        if not self.directions_blocked["up"] and direction == "up":
+            self.movement_points[0] = 64
+        if not self.directions_blocked["right"] and direction == "right":
+            self.movement_points[1] = 64
+        if not self.directions_blocked["down"] and direction == "down":
+            self.movement_points[2] = 64
+        if not self.directions_blocked["left"] and direction == "left":
+            self.movement_points[3] = 64
+
+    def animate(self):
+        print "Lol"
 
     def modify_health(self, modifier):
         self.health += modifier
