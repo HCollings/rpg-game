@@ -4,13 +4,14 @@ try:
     import os
     import sys
     import pygame
-    import math
+    import gui
     import resources
 except ImportError, err:
     print "cannot load module(s)"
     sys.exit(2)  
 
 class Player(pygame.sprite.Sprite):
+    
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = resources.load_image("player.png")
@@ -35,6 +36,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.left = x
         if self.state != "idle":
             self.animate()
+        if len(self.inventory) > 0:
+            self.draw_iventory()
         if self.health == 0.0:
             self.die()
 
@@ -88,6 +91,13 @@ class Player(pygame.sprite.Sprite):
             self.modify_health(health_modifier)
             self.modify_mana(mana_modifier)
         self.inventory.remove(item)
+
+    def draw_iventory(self):
+        menu_list = []
+        for item in self.inventory:
+            menu_list.append(item.name)     
+        menu = gui.Menu(menu_list, (10, 10), (150, 100))
+        menu.draw()        
 
     def modify_health(self, modifier):
         self.health += modifier

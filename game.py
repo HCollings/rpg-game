@@ -9,6 +9,7 @@ try:
     from pygame.locals import *
     import level as l
     import player as p
+    import gui
     import item
     import item_list
     import resources
@@ -45,16 +46,14 @@ class Game:
         self.entities = pygame.sprite.Group(player)
         self.set_player_center(player)
         self.set_level_offset(level, player)
+
+        self.gui = gui.Gui()
         
         self.play(level, player)
 
     def get_time(self):
         #returns time passed in seconds
         return float(pygame.time.get_ticks()) / 1000.0
-
-    def draw_to_hud(self, text, x, y):
-        label = self.font.render(text, 1, (255,255,0))
-        self.screen.blit(label, (x, y))
 
     def set_player_center(self, player):
         #set player in screen center
@@ -103,17 +102,18 @@ class Game:
 
     def update(self, level, player):
         #call update method for all entities
-        self.entities.update()
+        self.entities.update()  
         for entity in self.entities:
             #update player location relative to map
             entity.location[0] = entity.position[0] - self.background_rect.left
             entity.location[1] = entity.position[1] - self.background_rect.top
         self.is_player_blocked(level, player)
-        self.handle_events(player)     
-
+        self.handle_events(player)
+        
     def render(self):
         self.screen.blit(self.background, self.background_rect)
         dirty_rects = self.entities.draw(self.screen)
+        self.gui.draw()
         pygame.display.update()
 
     def play(self, level, player):
@@ -128,7 +128,7 @@ class Game:
             #update
             while self.accumulator >= dt:
                 self.update(level, player)
-                self.accumulator -= dt           
+                self.accumulator -= dt
             player.move(self.background_rect)
             #render
             self.render()      

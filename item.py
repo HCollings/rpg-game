@@ -34,7 +34,7 @@ class Weapon(Item):
 
 class Consumable(Item):
 
-    def __init__(self, item):  
+    def __init__(self, item):
         self.name = item["name"]
         Item.__init__(self, self.name, "consumable")
         self.health_modifier = item["health_modifier"]
