@@ -61,20 +61,6 @@ class Player(pygame.sprite.Sprite):
         if not self.directions_blocked["left"] and direction == "left":
             self.movement_points[3] = 64
 
-    def move(self, background_rect):
-        if self.movement_points[0] > 0:
-            background_rect.top += 1
-            self.movement_points[0] -= 1
-        if self.movement_points[1] > 0:
-            background_rect.left -= 1
-            self.movement_points[1] -= 1
-        if self.movement_points[2] > 0:
-            background_rect.top -= 1
-            self.movement_points[2] -= 1
-        if self.movement_points[3] > 0:
-            background_rect.left += 1
-            self.movement_points[3] -= 1   
-
     def animate(self):
         print "animate"
 

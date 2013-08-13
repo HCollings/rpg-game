@@ -67,13 +67,6 @@ class Game:
         self.background_rect.top = - top_offset
         self.background_rect.left = - left_offset
 
-    def is_player_blocked(self, level, player):
-        x, y = player.get_coordinates()
-        player.directions_blocked["up"] = level.is_wall(x, y - 1)
-        player.directions_blocked["right"] = level.is_wall(x + 1, y)
-        player.directions_blocked["down"] = level.is_wall(x, y + 1)
-        player.directions_blocked["left"] = level.is_wall(x - 1, y)
-
     def handle_events(self, player):
         dt = self.__dt
         player.movement_cooldown += dt
@@ -92,15 +85,32 @@ class Game:
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-                    
+
+    def handle_movement(self, player):
+        s = self.tile_size / (player.movement_limit * 100)
+        if player.movement_points[0] > 0:
+            self.background_rect.top += s
+            player.movement_points[0] -= s
+        if player.movement_points[1] > 0:
+            self.background_rect.left -= s
+            player.movement_points[1] -= s
+        if player.movement_points[2] > 0:
+            self.background_rect.top -= s
+            player.movement_points[2] -= s
+        if player.movement_points[3] > 0:
+            self.background_rect.left += s
+            player.movement_points[3] -= s
+    
     def is_player_blocked(self, level, player):
         x, y = player.get_coordinates()
         player.directions_blocked["up"] = level.is_wall(x, y - 1)
         player.directions_blocked["right"] = level.is_wall(x + 1, y)
         player.directions_blocked["down"] = level.is_wall(x, y + 1)
-        player.directions_blocked["left"] = level.is_wall(x - 1, y)
+        player.directions_blocked["left"] = level.is_wall(x - 1, y)    
 
     def update(self, level, player):
+        self.handle_events(player)
+        self.handle_movement(player)
         #call update method for all entities
         self.entities.update()  
         for entity in self.entities:
@@ -108,7 +118,6 @@ class Game:
             entity.location[0] = entity.position[0] - self.background_rect.left
             entity.location[1] = entity.position[1] - self.background_rect.top
         self.is_player_blocked(level, player)
-        self.handle_events(player)
         
     def render(self):
         self.screen.blit(self.background, self.background_rect)
@@ -129,7 +138,6 @@ class Game:
             while self.accumulator >= dt:
                 self.update(level, player)
                 self.accumulator -= dt
-            player.move(self.background_rect)
             #render
             self.render()      
     
