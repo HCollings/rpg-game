@@ -46,10 +46,8 @@ class Game:
         self.entities = pygame.sprite.Group(player)
         self.set_player_center(player)
         self.set_level_offset(level, player)
-
         self.gui = gui.Gui()
-        
-        self.play(level, player)
+        return level, player
 
     def get_time(self):
         #returns time passed in seconds
@@ -88,18 +86,18 @@ class Game:
 
     def handle_movement(self, player):
         s = self.tile_size / (player.movement_limit * 100)
-        if player.movement_points[0] > 0:
+        if player.get_movement_points(0) > 0:
             self.background_rect.top += s
-            player.movement_points[0] -= s
-        if player.movement_points[1] > 0:
+            player.modify_movement_points(0, -s)
+        if player.get_movement_points(1) > 0:
             self.background_rect.left -= s
-            player.movement_points[1] -= s
-        if player.movement_points[2] > 0:
+            player.modify_movement_points(1, -s)
+        if player.get_movement_points(2) > 0:
             self.background_rect.top -= s
-            player.movement_points[2] -= s
-        if player.movement_points[3] > 0:
+            player.modify_movement_points(2, -s)
+        if player.get_movement_points(3) > 0:
             self.background_rect.left += s
-            player.movement_points[3] -= s
+            player.modify_movement_points(3, -s)
     
     def is_player_blocked(self, level, player):
         x, y = player.get_coordinates()
@@ -125,7 +123,8 @@ class Game:
         self.gui.draw()
         pygame.display.update()
 
-    def play(self, level, player):
+    def play(self):
+        level, player = self.load()
         dt = self.__dt
         while True:
             time_new = self.get_time()
@@ -144,7 +143,7 @@ class Game:
 def main():
     pygame.init()
     game = Game()
-    game.load()
+    game.play()
 
 if __name__ == "__main__":
     main()
